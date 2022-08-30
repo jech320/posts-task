@@ -1,4 +1,4 @@
-import { Comment } from 'models';
+import { Comment, User } from 'models';
 
 interface PostSchema {
   id: number;
@@ -6,6 +6,7 @@ interface PostSchema {
   title: string;
   body: string;
   comments?: Comment[];
+  author?: User;
 }
 
 export type { PostSchema };

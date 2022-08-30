@@ -1,6 +1,7 @@
 import { PostSchema } from 'interfaces';
 import { API } from 'utils';
 import { Comment } from './Comment';
+import { User } from './User';
 
 class Post implements PostSchema {
   id!: number;
@@ -8,6 +9,7 @@ class Post implements PostSchema {
   title!: string;
   body!: string;
   comments?: Comment[];
+  author?: User;
 
   constructor(props: PostSchema) {
     if (props) {
@@ -27,14 +29,37 @@ class Post implements PostSchema {
     return new Post(result);
   }
 
-  static async fetchWithComments(options: RequestInit): Promise<Post[]> {
-    const posts = await Post.fetchAll(options);
+  static async fetchWithAuthorAndComments(
+    options: RequestInit
+  ): Promise<Post[]> {
+    const [posts, users] = await Promise.all([
+      Post.fetchAll(options),
+      User.fetchAll(options),
+    ]);
+
+    type UsersIndexType = {
+      [userId: string]: User;
+    };
+
+    const usersIndex: UsersIndexType = users.reduce(
+      (acc, curr: User) => ({
+        ...acc,
+        [curr.id]: curr,
+      }),
+      {}
+    );
 
     return Promise.all(
-      posts.map(async ({ id, ...postProps }: Post) => {
+      posts.map(async ({ id, userId, ...postProps }: Post) => {
         const comments = await Comment.fetch(id, options);
 
-        return new Post({ ...postProps, id, comments });
+        return new Post({
+          ...postProps,
+          id,
+          comments,
+          userId,
+          author: usersIndex[userId],
+        });
       })
     );
   }
