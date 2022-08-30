@@ -15,19 +15,19 @@ class Post implements PostSchema {
     }
   }
 
-  static async fetchAll(options: RequestInit) {
+  static async fetchAll(options: RequestInit): Promise<Post[]> {
     const result = await API.get('posts', options);
 
     return result.map((data: Post) => new Post(data));
   }
 
-  static async fetch(id: string, options: RequestInit) {
+  static async fetch(id: string, options: RequestInit): Promise<Post> {
     const result = await API.get(`posts/${id}`, options);
 
     return new Post(result);
   }
 
-  static async fetchWithComments(options: RequestInit) {
+  static async fetchWithComments(options: RequestInit): Promise<Post[]> {
     const posts = await Post.fetchAll(options);
 
     return Promise.all(

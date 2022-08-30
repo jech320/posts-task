@@ -14,7 +14,7 @@ class Comment implements CommentSchema {
     }
   }
 
-  static async fetch(postId: number, options: RequestInit) {
+  static async fetch(postId: number, options: RequestInit): Promise<Comment[]> {
     const result = await API.get(`posts/${postId}/comments`, options);
 
     return result.map((data: Comment) => new Comment(data));
