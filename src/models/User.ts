@@ -28,6 +28,12 @@ class User implements UserSchema {
 
     return result.map((data: User) => new User(data));
   }
+
+  static async fetch(id: number, options: RequestInit): Promise<User> {
+    const result = await API.get(`users/${id}`, options);
+
+    return new User(result);
+  }
 }
 
 export { User };
